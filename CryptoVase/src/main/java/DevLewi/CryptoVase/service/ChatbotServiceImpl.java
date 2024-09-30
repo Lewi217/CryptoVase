@@ -103,8 +103,11 @@ public class ChatbotServiceImpl implements ChatbotService{
 
                   ).toString();
 
-          HttpEntity<String> requestEntity = new HttpEntity
-        return "";
+          HttpEntity<String> requestEntity = new HttpEntity<>(requestBody,headers);
+
+          RestTemplate restTemplate = new RestTemplate();
+          ResponseEntity<String> response = restTemplate.postForEntity(GEMINI_API_URL,requestEntity,String.class);
+        return response.getBody();
     }
 
 }

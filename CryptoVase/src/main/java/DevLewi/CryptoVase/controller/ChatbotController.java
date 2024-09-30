@@ -30,11 +30,11 @@ public class ChatbotController {
     }
 
     @PostMapping("/simple")
-    public ResponseEntity<ApiResponse> simpleChatHandler(@RequestBody PromptBody prompt) throws Exception {
+    public ResponseEntity<String> simpleChatHandler(@RequestBody PromptBody prompt) throws Exception {
         String response = chatbotService.simpleChat(prompt.getPrompt());
 
-        ApiResponse response = new ApiResponse();
-        response.setMessage(prompt.getPrompt());
+//        ApiResponse response = new ApiResponse();
+//        response.setMessage(prompt.getPrompt());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

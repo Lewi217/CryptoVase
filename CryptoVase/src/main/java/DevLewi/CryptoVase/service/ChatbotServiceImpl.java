@@ -17,7 +17,7 @@ import java.util.Map;
 @Service
 public class ChatbotServiceImpl implements ChatbotService{
 
-    String GEMINI_API_KEY="AIzaSyDHIIRFMSKy4n2yiRg-u4wJjA64W6KghyE";
+    String GEMINI_API_KEY="YOUR_GEMINI_API_KEY";
     private double convertToDouble(Object value){
         if(value instanceof Integer){
             return ((Integer)value).doubleValue();

@@ -16,6 +16,8 @@ import java.util.Map;
 
 @Service
 public class ChatbotServiceImpl implements ChatbotService{
+
+    String GEMINI_API_KEY="AIzaSyDHIIRFMSKy4n2yiRg-u4wJjA64W6KghyE";
     private double convertToDouble(Object value){
         if(value instanceof Integer){
             return ((Integer)value).doubleValue();
@@ -89,7 +91,8 @@ public class ChatbotServiceImpl implements ChatbotService{
 
     @Override
     public String simpleChat(String prompt) {
-        String GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
+        String GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
+                +GEMINI_API_KEY;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

@@ -17,7 +17,7 @@ import java.util.Map;
 @Service
 public class ChatbotServiceImpl implements ChatbotService{
 
-    String GEMINI_API_KEY="YOUR_GEMINI_API_KEY";
+    String GEMINI_API_KEY="AIzaSyDHIIRFMSKy4n2yiRg-u4wJjA64W6KghyE";
     private double convertToDouble(Object value){
         if(value instanceof Integer){
             return ((Integer)value).doubleValue();
@@ -82,12 +82,72 @@ public class ChatbotServiceImpl implements ChatbotService{
         throw new Exception("coin not found");
     }
 
+    public FunctionResponse getFunctionResponse(String prompt) {
+        String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
+
+        // Create JSON request body using method chaining
+        JSONObject requestBodyJson = new JSONObject()
+                .put("contents", new JSONArray()
+                        .put(new JSONObject()
+                                .put("parts", new JSONArray()
+                                        .put(new JSONObject()
+                                                .put("text", prompt)
+                                        )
+                                )
+                        )
+                )
+                .put("tools", new JSONArray()) // Fixed issue here
+                .put("functionalDeclarations", new JSONArray() // Removed misplaced empty JSONObject
+                        .put(new JSONObject()
+                                .put("name", "getCoinDetails")
+                                .put("description", "Get the coin details from given currency object")
+                                .put("parameters", new JSONObject())
+                                .put("type", "OBJECT")
+                                .put("currencyName", new JSONObject()
+                                        .put("type", "STRING")
+                                        .put("description", "The currency name, id, symbol.")
+                                )
+                                .put("currencyDate", new JSONObject()
+                                        .put("type", "STRING")
+                                        .put("description",
+                                                "Currency Data id, symbol, name, image, current_price, " +
+                                                        "market_cap, market_cap_rank, fully_diluted_valuation, " +
+                                                        "total_volume, high_24h, low_24h, price_change_24h, " +
+                                                        "price_change_percentage_24h, market_cap_change_24h, " +
+                                                        "market_cap_change_percentage_24h, circulating_supply, " +
+                                                        "total_supply, max_supply, ath, ath_change_percentage, " +
+                                                        "ath_date, atl, atl_change_percentage, atl_date, last_updated."
+                                        )
+                                )
+                        )
+                        .put("required", new JSONArray()
+                                .put("currencyName")
+                                .put("currencyData")
+                        )
+                );
+
+    )
+   //Create Http headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+    //Create the Http entity with headers and request body
+
+    HttpEntity<String> requestEntity = new HttpEntity<>(requestBodyJson.toString(), headers);
+
+    }
+
     @Override
     public ApiResponse getCoinDetails(String prompt) throws Exception {
         CoinDto coinDto = makeApiRequest(prompt);
         System.out.println("coin dto ------" + coinDto);
         return null;
     }
+
+
+
+
+    //simple chat
 
     @Override
     public String simpleChat(String prompt) {

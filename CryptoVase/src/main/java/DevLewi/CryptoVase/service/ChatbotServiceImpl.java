@@ -2,6 +2,7 @@ package DevLewi.CryptoVase.service;
 
 import DevLewi.CryptoVase.dto.CoinDto;
 import DevLewi.CryptoVase.response.ApiResponse;
+import DevLewi.CryptoVase.response.FunctionResponse;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -83,7 +84,7 @@ public class ChatbotServiceImpl implements ChatbotService{
     }
 
     public FunctionResponse getFunctionResponse(String prompt) {
-        String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
+        String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + GEMINI_API_KEY;
 
         // Create JSON request body using method chaining
         JSONObject requestBodyJson = new JSONObject()
@@ -96,37 +97,42 @@ public class ChatbotServiceImpl implements ChatbotService{
                                 )
                         )
                 )
-                .put("tools", new JSONArray()) // Fixed issue here
-                .put("functionalDeclarations", new JSONArray() // Removed misplaced empty JSONObject
+                .put("tools", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "getCoinDetails")
-                                .put("description", "Get the coin details from given currency object")
-                                .put("parameters", new JSONObject())
-                                .put("type", "OBJECT")
-                                .put("currencyName", new JSONObject()
-                                        .put("type", "STRING")
-                                        .put("description", "The currency name, id, symbol.")
-                                )
-                                .put("currencyDate", new JSONObject()
-                                        .put("type", "STRING")
-                                        .put("description",
-                                                "Currency Data id, symbol, name, image, current_price, " +
-                                                        "market_cap, market_cap_rank, fully_diluted_valuation, " +
-                                                        "total_volume, high_24h, low_24h, price_change_24h, " +
-                                                        "price_change_percentage_24h, market_cap_change_24h, " +
-                                                        "market_cap_change_percentage_24h, circulating_supply, " +
-                                                        "total_supply, max_supply, ath, ath_change_percentage, " +
-                                                        "ath_date, atl, atl_change_percentage, atl_date, last_updated."
+                                .put("functionalDeclarations", new JSONArray()
+                                        .put(new JSONObject()
+                                                .put("name", "getCoinDetails")
+                                                .put("description", "Get the coin details from given currency object")
+                                                .put("parameters", new JSONObject()
+                                                        .put("type", "OBJECT")
+                                                        .put("properties", new JSONObject()
+                                                                .put("currencyName", new JSONObject()
+                                                                        .put("type", "STRING")
+                                                                        .put("description", "The currency name, id, symbol.")
+                                                                )
+                                                                .put("currencyDate", new JSONObject()
+                                                                        .put("type", "STRING")
+                                                                        .put("description",
+                                                                                "Currency Data id, symbol, name, image, current_price, " +
+                                                                                        "market_cap, market_cap_rank, fully_diluted_valuation, " +
+                                                                                        "total_volume, high_24h, low_24h, price_change_24h, " +
+                                                                                        "price_change_percentage_24h, market_cap_change_24h, " +
+                                                                                        "market_cap_change_percentage_24h, circulating_supply, " +
+                                                                                        "total_supply, max_supply, ath, ath_change_percentage, " +
+                                                                                        "ath_date, atl, atl_change_percentage, atl_date, last_updated."
+                                                                        )
+                                                                )
+                                                        )
+                                                        .put("required", new JSONArray()
+                                                                .put("currencyName")
+                                                                .put("currencyData")
+                                                        )
+                                                )
                                         )
                                 )
                         )
-                        .put("required", new JSONArray()
-                                .put("currencyName")
-                                .put("currencyData")
-                        )
                 );
 
-    )
    //Create Http headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -135,12 +141,37 @@ public class ChatbotServiceImpl implements ChatbotService{
 
     HttpEntity<String> requestEntity = new HttpEntity<>(requestBodyJson.toString(), headers);
 
-    }
+
+
+    //Make the POST request
+    RestTemplate restTemplate = new RestTemplate();
+    ResponseEntity<String> response = restTemplate.postForEntity(GEMINI_API_URL, requestEntity, String.class);
+
+    String responseBody = response.getBody();
+
+//    ReadContext ctx = JsonPath.parse(responseBody);
+//
+//    //Extract specific values
+//    String currencyName = ctx.read("$.candidates[0].context.parts[0].functionalCall.args.currencyName");
+//    String currencyData = ctx.read("$.candidates[0].context.parts[0].functionalCall.args.currencyData");
+//    String name = ctx.read("$.candidates[0].context.parts[0].functionalCall.name");
+//
+//    //Print the extracted values
+//    FunctionResponse res = new FunctionResponse();
+//    res.setCurrencyName(currencyName);
+//    res.setCurrencyData(currencyData);
+//    res.setFunctionName(name);
+
+    System.out.println("=------------ "+responseBody);
+
+    return null;
+}
 
     @Override
     public ApiResponse getCoinDetails(String prompt) throws Exception {
         CoinDto coinDto = makeApiRequest(prompt);
-        System.out.println("coin dto ------" + coinDto);
+        getFunctionResponse(prompt);
+        System.out.println("coin dto ------ "+ coinDto);
         return null;
     }
 
